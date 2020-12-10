@@ -87,9 +87,6 @@ def menu(message):
 			final_message = f"По сегодняшнему курсу валют ЦБ РФ имеем:\n{messagelow[0:len(messagelow)-1]} <b>GBP</b> = {round(float(messagelow[0:len(messagelow)-1])*float(courses['pound']),3)} <b>RUB</b>\n"
 	else:
 		final_message = "Неверная команда или формат числа для конвертации"
-
-
-
 	converter.send_message(message.chat.id, final_message, parse_mode='html',reply_markup=buttons)
 
 converter.polling(none_stop=True)
