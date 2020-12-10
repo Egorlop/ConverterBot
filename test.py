@@ -54,7 +54,7 @@ def menu(message):
 		buttons.add(button1,button2, button3, button4)
 		final_message = "Выбери интересующую тебя валюту\n"
 	elif messagelow == "конвертер валют":
-		final_message = "Введи интересующую тебя сумму и валюту для конвертации в рубли.\nНапример:'49.5$'"
+		final_message = "Введи интересующую тебя сумму и валюту для конвертации в рубли.\nНапример:49.5$"
 	elif messagelow == "usd":
 		final_message = f"Курс доллара по отношению к рублю на <b>{today[0:10]}</b> по данным ЦБ РФ:\n1<b> USD</b> = {courses['dollar']}<b> RUB</b>"
 	elif messagelow == "eur":
