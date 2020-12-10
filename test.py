@@ -5,12 +5,7 @@ from telebot import types
 import datetime
 converter = telebot.TeleBot('1401850820:AAFIlzqtJn20Me0O74aqJ9_0wf-tGHsPmRc')
 
-def isfloat(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
+
 def parse():
 	URL = 'https://finance.rambler.ru/currencies/'
 	HEADERS = {
@@ -28,6 +23,13 @@ def parse():
 		'pound': pound[1:-1]
 	}
 	return courses
+def isfloat(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 @converter.message_handler(commands=['start'])
 def start(message):
 	buttons = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
