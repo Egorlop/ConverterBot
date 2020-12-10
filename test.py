@@ -3,26 +3,14 @@ from bs4 import BeautifulSoup
 import requests
 from telebot import types
 import datetime
-converter = telebot.TeleBot('1401850820:AAGyfTFNi4RL8bxlhxC-qAYUu9lJu7mgN2M')
+converter = telebot.TeleBot('1401850820:AAFTJYZObfw8jsx-Wm9_RD5ak4KIAhewURw')
 
-def convert(str1):
-	str= str1
-	for i in range(len(str)):
-		if str[i] == "$":
-			dollar = str[0:i]
-			flagdollar = i
-		if str[i] == "€":
-			euro = str[flagdollar + 2:i]
-			flageuro = i
-		if str[i] == "£":
-			pound = str[flageuro + 2:i]
-	convertvalues = {
-		'dollar': dollar,
-		'euro': euro,
-		'pound': pound
-
-	}
-	return convertvalues
+def isfloat(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 def parse():
 	URL = 'https://finance.rambler.ru/currencies/'
 	HEADERS = {
@@ -54,48 +42,52 @@ def start(message):
 
 @converter.message_handler(content_types=['text'])
 def menu(message):
-	trigger = 0
 	today = str(datetime.datetime.now())
 	messagelow = message.text.strip().lower()
 	courses = parse()
 	buttons = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
-	for i in range(len(messagelow)):
-		if messagelow[i]=="$" or messagelow[i]=="€" or messagelow[i]=="£" or messagelow[i]==" ":
-			trigger+=1
 	if messagelow == "курсы валют на сегодня":
+		button1 = types.KeyboardButton('USD')
+		button2 = types.KeyboardButton('EUR')
+		button3 = types.KeyboardButton('GBP')
+		button4 = types.KeyboardButton('В меню')
+		buttons.add(button1,button2, button3, button4)
+		final_message = "Выбери интересующую тебя валюту\n"
+	elif messagelow == "конвертер валют":
+		final_message = "Выбери интересующую тебя валюту для конвертации"
 		button1 = types.KeyboardButton('$')
 		button2 = types.KeyboardButton('€')
 		button3 = types.KeyboardButton('£')
 		button4 = types.KeyboardButton('В меню')
 		buttons.add(button1,button2, button3, button4)
-		final_message = "Выбери интересующую тебя валюту\n"
-	elif messagelow == "конвертер валют":
-		final_message = "<b>Введи набор интересующих тебя валют для конвертации.</b>\n\n" \
-						"Обрати внимание, что валюты должны быть введены в строго определенном порядке, без точек и запятых!\n"\
-						"<b>Например:</b> '45$ 148€ 15£'"
-	elif messagelow == "конвертер валют":
-		final_message = "Введи набор интересующих тебя валют для конвертации: "
-	elif messagelow == "$":
+	elif messagelow == "usd":
 		final_message = f"Курс доллара по отношению к рублю на <b>{today[0:10]}</b> по данным ЦБ РФ:\n1<b> USD</b> = {courses['dollar']}<b> RUB</b>"
-	elif messagelow == "€":
+	elif messagelow == "eur":
 		final_message = f"Курс евро по отношению к рублю на <b>{today[0:10]}</b> по данным ЦБ РФ:\n1<b> EUR </b>= {courses['euro']}<b> RUB</b>"
-	elif messagelow == "£":
+	elif messagelow == "gbp":
 		final_message = f"Курс фунта стерлингов по отношению к рублю на <b>{today[0:10]}</b> по данным ЦБ РФ:\n1<b> GBP</b> = {courses['pound']} <b>RUB</b>"
+	elif messagelow == "$":
+		final_message = f"Введи сумму в <b>$</b>, которую хочешь перевести в <b>₽</b>\n<b>Например</b>: '45.25$'"
+	elif messagelow == "€":
+		final_message = f"Введи сумму в <b>€</b>, которую хочешь перевести в <b>₽</b>\n<b>Например</b>: '61.93€'"
+	elif messagelow == "£":
+		final_message = f"Введи сумму в <b>£</b>, которую хочешь перевести в <b>₽</b>\n<b>Например</b>: '32.74£'"
 	elif messagelow=="в меню":
 		buttons = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
 		button1 = types.KeyboardButton('Курсы валют на сегодня')
 		button2 = types.KeyboardButton('Конвертер валют')
 		buttons.add(button1, button2)
 		final_message = "Выбери дальнейшее действие"
-	elif trigger == 5:
-		values=convert(messagelow)
-		final_message = f"По сегодняшнему курсу валют ЦБ РФ имеем:\n{values['dollar']} <b>USD</b> = {round(int(values['dollar'])*float(courses['dollar']),3)} <b>RUB</b>\n" \
-						f"{values['euro']} <b>EUR</b> = {round(int(values['euro']) * float(courses['euro']),3)} <b>RUB</b>\n" \
-						f"{values['pound']} <b>GBP</b> = {round(int(values['pound']) * float(courses['pound']), 3)} <b>RUB</b>\n"
-	elif trigger==0:
-		final_message = "Выбери дальнейшее действие"
+	elif isfloat(messagelow[0:len(messagelow)-1]):
+		if messagelow[len(messagelow)-1]=="$":
+			final_message = f"По сегодняшнему курсу валют ЦБ РФ имеем:\n{messagelow[0:len(messagelow)-1]} <b>USD</b> = {round(float(messagelow[0:len(messagelow)-1])*float(courses['dollar']),3)} <b>RUB</b>\n"
+		if messagelow[len(messagelow)-1]=="€":
+			final_message = f"По сегодняшнему курсу валют ЦБ РФ имеем:\n{messagelow[0:len(messagelow)-1]} <b>EUR</b> = {round(float(messagelow[0:len(messagelow)-1])*float(courses['euro']),3)} <b>RUB</b>\n"
+		if messagelow[len(messagelow)-1]=="£":
+			final_message = f"По сегодняшнему курсу валют ЦБ РФ имеем:\n{messagelow[0:len(messagelow)-1]} <b>GBP</b> = {round(float(messagelow[0:len(messagelow)-1])*float(courses['pound']),3)} <b>RUB</b>\n"
 	else:
-		final_message="Введи в нужном формате\n<b>Например:</b> '45$ 148€ 15£'"
+		final_message = "Неверная команда или формат числа для конвертации"
+
 
 
 	converter.send_message(message.chat.id, final_message, parse_mode='html',reply_markup=buttons)
