@@ -5,7 +5,12 @@ from telebot import types
 import datetime
 converter = telebot.TeleBot('1401850820:AAFIlzqtJn20Me0O74aqJ9_0wf-tGHsPmRc')
 
-
+def isfloat(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 def parse():
 	URL = 'https://finance.rambler.ru/currencies/'
 	HEADERS = {
@@ -23,13 +28,6 @@ def parse():
 		'pound': pound[1:-1]
 	}
 	return courses
-def isfloat(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
 @converter.message_handler(commands=['start'])
 def start(message):
 	buttons = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
@@ -44,6 +42,7 @@ def start(message):
 
 @converter.message_handler(content_types=['text'])
 def menu(message):
+	final_message=" "
 	today = str(datetime.datetime.now())
 	messagelow = message.text.strip().lower()
 	courses = parse()
@@ -56,19 +55,13 @@ def menu(message):
 		buttons.add(button1,button2, button3, button4)
 		final_message = "Выбери интересующую тебя валюту\n"
 	elif messagelow == "конвертер валют":
-		final_message = "Введи интересующую тебя сумму и валюту для конвертации в рубли.\nНапример: 49.5$"
+		final_message = "Введи интересующую тебя сумму и валюту для конвертации в рубли.\nНапример:'49.5$'"
 	elif messagelow == "usd":
 		final_message = f"Курс доллара по отношению к рублю на <b>{today[0:10]}</b> по данным ЦБ РФ:\n1<b> USD</b> = {courses['dollar']}<b> RUB</b>"
 	elif messagelow == "eur":
 		final_message = f"Курс евро по отношению к рублю на <b>{today[0:10]}</b> по данным ЦБ РФ:\n1<b> EUR </b>= {courses['euro']}<b> RUB</b>"
 	elif messagelow == "gbp":
 		final_message = f"Курс фунта стерлингов по отношению к рублю на <b>{today[0:10]}</b> по данным ЦБ РФ:\n1<b> GBP</b> = {courses['pound']} <b>RUB</b>"
-	elif messagelow == "$":
-		final_message = f"Введи сумму в <b>$</b>, которую хочешь перевести в <b>₽</b>\n<b>Например</b>: '45.25$'"
-	elif messagelow == "€":
-		final_message = f"Введи сумму в <b>€</b>, которую хочешь перевести в <b>₽</b>\n<b>Например</b>: '61.93€'"
-	elif messagelow == "£":
-		final_message = f"Введи сумму в <b>£</b>, которую хочешь перевести в <b>₽</b>\n<b>Например</b>: '32.74£'"
 	elif messagelow=="в меню":
 		buttons = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
 		button1 = types.KeyboardButton('Курсы валют на сегодня')
